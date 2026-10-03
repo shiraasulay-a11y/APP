@@ -82,7 +82,7 @@ class MainActivity : Activity() {
             setHintTextColor(Color.rgb(100, 116, 139))
             setTextColor(white)
             textSize = 16f
-            singleLine = true
+            setSingleLine(true)
             setPadding(18, 0, 18, 0)
             background = rounded(surface2, 22f)
         }
