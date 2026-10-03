@@ -14,23 +14,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-      - name: Install Android SDK
+
+      - name: Prepare Android SDK
+        shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          set -euxo pipefail
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          which sdkmanager || true
+          if ! command -v sdkmanager >/dev/null 2>&1; then
+            SDKMANAGER="$(find "$ANDROID_HOME" -type f -path '*/cmdline-tools/*/bin/sdkmanager' 2>/dev/null | head -n 1 || true)"
+            if [ -z "$SDKMANAGER" ]; then
+              echo "sdkmanager was not found on the GitHub runner."
+              exit 1
+            fi
+            SDK_DIR="$(dirname "$(dirname "$SDKMANAGER")")"
+            echo "$SDK_DIR/bin" >> "$GITHUB_PATH"
+          fi
+          yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
+
       - name: Publish APK artifact
         uses: actions/upload-artifact@v4
         with:
