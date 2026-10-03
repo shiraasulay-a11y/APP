@@ -104,7 +104,7 @@ class ChordDiagramView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = MeasureSpec.getSize(widthMeasure).coerceAtLeast(220)
+        val width = MeasureSpec.getSize(widthMeasureSpec).coerceAtLeast(220)
         val preferred = (width * 0.72f).toInt().coerceAtLeast(220)
         val height = when (MeasureSpec.getMode(heightMeasureSpec)) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(heightMeasureSpec)
