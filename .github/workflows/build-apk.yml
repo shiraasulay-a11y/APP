@@ -26,23 +26,12 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Prepare Android SDK
-        shell: bash
+      - name: Show Android SDK environment
         run: |
-          set -euxo pipefail
           echo "ANDROID_HOME=$ANDROID_HOME"
-          which sdkmanager || true
-          if ! command -v sdkmanager >/dev/null 2>&1; then
-            SDKMANAGER="$(find "$ANDROID_HOME" -type f -path '*/cmdline-tools/*/bin/sdkmanager' 2>/dev/null | head -n 1 || true)"
-            if [ -z "$SDKMANAGER" ]; then
-              echo "sdkmanager was not found on the GitHub runner."
-              exit 1
-            fi
-            SDK_DIR="$(dirname "$(dirname "$SDKMANAGER")")"
-            echo "$SDK_DIR/bin" >> "$GITHUB_PATH"
-          fi
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          java -version
+          gradle --version
 
       - name: Build debug APK
         run: gradle --no-daemon :app:assembleDebug
